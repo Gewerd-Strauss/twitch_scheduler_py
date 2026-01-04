@@ -9,6 +9,7 @@ from pathlib import Path
 from platformdirs import user_config_dir
 from modules.core.state_store import StateStore
 from modules.core.secret_store import SecretStore
+from modules.core.config_schema import ConfigSchema
 
 class BaseConfigHandler(ABC):
     """
@@ -22,6 +23,20 @@ class BaseConfigHandler(ABC):
     - lifecycle hooks
 
     No domain logic allowed.
+
+    Contract:
+    - Provides config/state/secret storage
+    - Handles file IO and merging
+    - Calls lifecycle hooks in a fixed order
+    
+
+    Subclasses MUST: 
+    - define default config schema
+    - validate semantic correctness
+
+    Subclasses MUST NOT: 
+    - override load/save logic
+    - perform IO in build_default_settings
     """
 
     def __init__(
@@ -64,13 +79,12 @@ class BaseConfigHandler(ABC):
             appname=appname,
         )
 
-
         # Runtime containers
         self.default_settings: dict = {}
         self.applied_settings: dict = {}
 
         # Lifecycle
-        self._init_defaults()
+        self._init_schema()
         self.apply_defaults()
         self.post_init()
 
@@ -79,8 +93,8 @@ class BaseConfigHandler(ABC):
     # ------------------------------------------------------------------
 
     @abstractmethod
-    def build_default_settings(self) -> dict:
-        """Return default configuration dict."""
+    def build_schema(self) -> ConfigSchema:
+        """Return the ConfigSchema instance for this application"""
         raise NotImplementedError
 
     @abstractmethod
@@ -93,7 +107,10 @@ class BaseConfigHandler(ABC):
     # ------------------------------------------------------------------
 
     def post_init(self) -> None:
-        """Called after defaults are applied."""
+        """
+        Called after defaults are applied.
+        Must be called prior to `load_user_config_and_merge()`.
+        """
         pass
 
     def post_load(self) -> None:
@@ -104,8 +121,9 @@ class BaseConfigHandler(ABC):
     # Initialization
     # ------------------------------------------------------------------
 
-    def _init_defaults(self) -> None:
-        self.default_settings = self.build_default_settings()
+    def _init_schema(self) -> None:
+        self.schema = self.build_schema()
+        self.default_settings = self.schema.defaults()
 
     def apply_defaults(self) -> None:
         self.applied_settings = self.default_settings.copy()
@@ -114,13 +132,24 @@ class BaseConfigHandler(ABC):
     # Loading / Saving
     # ------------------------------------------------------------------
 
-    def load_from_file(self, path: str | Path) -> None:
+    def load_user_config_and_merge(self, path: str | Path) -> None:
+        """
+        load_user_config_and_merge performs in order: 
+        - loads the user configuration, 
+        - merges it into applied settings,
+        - calls `self.validate()`; which is abstract and must be implemented
+        - calls the `post_load()`-hook
+
+        :param self: Description
+        :param path: Path to the configuration file to be loaded by the user
+        :type path: str | Path
+        """
         try:
             with open(path, "r", encoding="utf-8") as f:
                 user_config = yaml.safe_load(f) or {}
             self.applied_settings = self.merge_dicts(self.applied_settings, user_config)
             self.logger.info(f"Loaded config from {path}")
-            self.validate()
+            self.schema.validate(self.applied_settings)
             self.post_load()
         except FileNotFoundError:
             self.logger.error(f"Config file not found: {path}")
