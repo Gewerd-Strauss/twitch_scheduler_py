@@ -221,7 +221,8 @@ class BaseConfigHandler(ABC):
                     )
                     merged[key] = value
                 else:
-                    self.logger.error(f"Unhandled key '{key}' found in user config.")
+                    # self.logger.error(f"Unhandled key '{key}' found in user config.")
+                    raise KeyError(f"Unhandled key '{key}' found in user config.")
                 continue
 
             if isinstance(dict_default[key], dict) and isinstance(value, dict):
