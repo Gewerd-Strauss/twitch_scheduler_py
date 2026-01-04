@@ -102,6 +102,15 @@ class BaseConfigHandler(ABC):
         self.logger.debug(f"[lifecycle] {step}")
 
     # ------------------------------------------------------------------
+    # State hooks
+    # ------------------------------------------------------------------
+
+    def load_stores(self) -> None:
+        self.state.load()
+    def save_stores(self) -> None:
+        self.state.save()
+
+    # ------------------------------------------------------------------
     # Abstract API – subclasses MUST implement these
     # ------------------------------------------------------------------
 
@@ -163,7 +172,13 @@ class BaseConfigHandler(ABC):
             self.applied_settings = self.merge_dicts(self.applied_settings, user_config)
             self.logger.info(f"Loaded config from {path}")
             self._lifecycle(f"user_config:loaded ({path})")
+            
             self.schema.validate(self.applied_settings)
+            self._lifecycle("user_config:validated")
+            
+            self.load_stores()
+            self._lifecycle("stores:load")
+
             self.post_load()
             self._lifecycle("post_load")
         except FileNotFoundError:
