@@ -83,10 +83,23 @@ class BaseConfigHandler(ABC):
         self.default_settings: dict = {}
         self.applied_settings: dict = {}
 
+
         # Lifecycle
+        self._lifecycle("init:start")
         self._init_schema()
+        self._lifecycle("schema:build")
         self.apply_defaults()
+        self._lifecycle("defaults:applied")
         self.post_init()
+        self._lifecycle("post_init")
+    
+    # ------------------------------------------------------------------
+    # Lifecycle helpers
+    # ------------------------------------------------------------------
+
+    def _lifecycle(self, step: str) -> None:
+        """Internal helper to track lifecycle steps via debug logging."""
+        self.logger.debug(f"[lifecycle] {step}")
 
     # ------------------------------------------------------------------
     # Abstract API – subclasses MUST implement these
@@ -149,8 +162,10 @@ class BaseConfigHandler(ABC):
                 user_config = yaml.safe_load(f) or {}
             self.applied_settings = self.merge_dicts(self.applied_settings, user_config)
             self.logger.info(f"Loaded config from {path}")
+            self._lifecycle(f"user_config:loaded ({path})")
             self.schema.validate(self.applied_settings)
             self.post_load()
+            self._lifecycle("post_load")
         except FileNotFoundError:
             self.logger.error(f"Config file not found: {path}")
         except yaml.YAMLError as e:
