@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 
-# Safely read the version from obsidianknittrpy/__init__.py
+# Safely read the version from twitchschedulerpy/__init__.py
 def get_version():
     version = None
     with open("twitchschedulerpy/__init__.py", "r", encoding="utf-8") as f:
@@ -38,7 +38,7 @@ setup(
     extras_require={"dev": ["pipreqs", "black"]},
     entry_points={
         "console_scripts": [
-            "twitchschedulerpy=twitchschedulerpy.main:main",  # entry-point for obsidianknittrpy
+            "twitchschedulerpy=twitchschedulerpy.main:main",  # entry-point for twitchschedulerpy
             "tws=twitchschedulerpy.main:main",  # entry-point shorthand
         ],
     },
