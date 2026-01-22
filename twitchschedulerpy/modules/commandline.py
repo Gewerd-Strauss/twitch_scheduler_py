@@ -248,10 +248,9 @@ def channel_parser_setup(channel_parser):
         formatter_class=argparse.RawTextHelpFormatter
     )
     remove_parser.add_argument(
-        "--client-id",
-        dest="client_id",
+        "channel",
         type=str,
-        help="Set/Unset Twitch application Client ID",
+        help="Twitch channel name or ID to remove",
     )
     common_arguments(remove_parser)  # Reuse shared arguments for 'gui'
     # 'list' command

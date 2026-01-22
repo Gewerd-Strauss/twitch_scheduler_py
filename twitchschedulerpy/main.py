@@ -70,13 +70,7 @@ def main():
                 # -------------------------------
                 # QUERY/MODIFY TWITCH CONFIG
                 # -------------------------------
-                if args["action"] == "add":
-                    handle_channels(args,RL, CH)
-                elif args["action"] == "remove":
-                    raise NotImplementedError("remove a channel to track here")
-                elif args["action"] == "list":
-                    raise NotImplementedError("list currently tracked channels here")
-                # handle_channels(args)
+                handle_channels(args,RL, CH)
             else:
                 raise NotImplementedError(
                     f"The argument {args.command}is not implemented."
