@@ -286,8 +286,9 @@ def channel_parser_setup(channel_parser):
         formatter_class=argparse.RawTextHelpFormatter
     )
     add_parser.add_argument(
-        "channel",
+        "channels",
         type=str,
+        nargs="+",
         help="Twitch channel name or ID to add",
     )
     common_arguments(add_parser)  # Reuse shared arguments for 'gui'
@@ -301,8 +302,9 @@ def channel_parser_setup(channel_parser):
         formatter_class=argparse.RawTextHelpFormatter
     )
     remove_parser.add_argument(
-        "channel",
+        "channels",
         type=str,
+        nargs="+",
         help="Twitch channel name or ID to remove",
     )
     common_arguments(remove_parser)  # Reuse shared arguments for 'gui'
