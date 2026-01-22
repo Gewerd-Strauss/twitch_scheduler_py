@@ -21,21 +21,23 @@ def setup_repository(CH: TwitchSchedulerConfigHandler, RL: ResourceLogger) -> No
     if not os.path.exists(CH.synch_repo):
         raise FileNotFoundError(f"Directory '{CH.synch_repo}' does not exist")
     git_subdir = Path(CH.synch_repo)  / ".git"
+    name = CH.config.GITHUB.name
+    email = CH.config.GITHUB.email
+    repo_remote = CH.config.GITHUB.repo_remote
+    if CH.config.GITHUB.login_via_ssh:
+        repo = f"git@github.com/{name}/{repo_remote}"
+    else:
+        repo = f"https://github.com/{name}/{repo_remote}.git"
     if not os.path.exists(git_subdir):
         shutil.rmtree(CH.synch_repo)
-        name = CH.config.GITHUB.name
-        email = CH.config.GITHUB.email
-        repo_remote = CH.config.GITHUB.repo_remote
-        if CH.config.GITHUB.login_via_ssh:
-            repo = f"git@github.com/{name}/{repo_remote}"
-        else:
-            repo = f"https://github.com/{name}/{repo_remote}.git"
-        cmd = f"""
-    git clone {repo} "{CH.synch_repo}"
-    git config --local core.autocrlf false
-    git config --local user.email "{email}
-    git config --local user.name "{name}
-        """
+        RL.log("setup_repository","clears",CH.synch_repo)
+        cmd = (
+
+        f'git clone {repo} "{CH.synch_repo}" && '
+        f'git config --local core.autocrlf false && '
+        f'git config --local user.email "{email}" && '
+        f'git config --local user.name "{name}"'
+        )
         subprocess.run(
             cmd,
             shell=True,
@@ -43,6 +45,7 @@ def setup_repository(CH: TwitchSchedulerConfigHandler, RL: ResourceLogger) -> No
             stdout= subprocess.DEVNULL,
             stderr=subprocess.DEVNULL
         )
+        RL.log("setup_repository",f"cloned {repo} into",CH.synch_repo)
 
     # (reset/fetch/pull)
     cmd = "git reset --hard & git fetch & git pull"
@@ -55,6 +58,7 @@ def setup_repository(CH: TwitchSchedulerConfigHandler, RL: ResourceLogger) -> No
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
+    RL.log("setup_repository", f"reset, fetched, and pulled into {CH.synch_repo}", repo)
 
 
 def update_repository(CH: TwitchSchedulerConfigHandler):
