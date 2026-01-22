@@ -8,3 +8,20 @@ def handle_version(args):
         print(f"Current version: {__version__}")
     exit(0)
 
+def handle_configs(args, RL, CH):
+    logging.basicConfig(level=args["loglevel"])
+    RL.log("main","inits","config")
+    if args["action"]=="twitch":
+        if args["client_id"] is not None:
+            RL.log("handle_configs", "set", "twitch_client_id")
+            CH.secrets.set("twitch_client_id",args["client_id"])
+        if args["client_secret"] is not None:
+            RL.log("handle_configs", "set", "client_secret")
+            CH.secrets.set("twitch_client_secret",args["client_secret"])
+            RL.log("handle_configs", "set", "client_secret")
+        if args["access_token"] is not None:
+            RL.log("handle_configs", "set", "access_token")
+            CH.secrets.set("twitch_access_token",args["access_token"])
+    else:
+        raise NotImplementedError("config handling is not yet set up for components other than twitch.")
+    return

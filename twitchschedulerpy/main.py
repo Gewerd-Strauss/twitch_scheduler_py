@@ -7,6 +7,7 @@ from twitchschedulerpy import __appname__, __author__, __version__
 from twitchschedulerpy.modules.commandline import commandline_setup
 from twitchschedulerpy.modules.command_handlers import (
     handle_version,
+    handle_configs,
 )
 from twitchschedulerpy.modules.utility import (
     convert_format_args,
@@ -56,6 +57,13 @@ def main():
             version=__version__,
             loglevel=args["loglevel"],
         )
+        if args["command"] == "config":
+            # -------------------------------
+            # HANDLE VERB: CONFIG
+            # -------------------------------
+            handle_configs(args, RL, CH)
+        else:
+            pass
 
     pass
 
