@@ -7,6 +7,7 @@ from twitchschedulerpy import __appname__, __author__, __version__
 from twitchschedulerpy.modules.commandline import commandline_setup
 from twitchschedulerpy.modules.command_handlers import (
     handle_version,
+    handle_twitch,
     handle_channels,
     handle_configs,
 )
@@ -65,12 +66,33 @@ def main():
             # -------------------------------
             handle_configs(args, RL, CH)
         else:
-            pass
             if args["command"] == "channel":
                 # -------------------------------
                 # QUERY/MODIFY TWITCH CONFIG
                 # -------------------------------
                 handle_channels(args, RL, CH)
+            elif args["command"] == "execute":
+                # -------------------------------
+                # EXECUTE SUBMODULES
+                # -------------------------------
+                if args["action"] == "all":
+                    raise NotImplementedError(
+                        "Handle all of the below - just a wrapper."
+                    )
+                elif args["action"] == "twitch":
+                    calendar_ical = handle_twitch(args, RL, CH)
+                    handle_local_file_interface(calendar_ical, args, RL, CH)
+                    raise NotImplementedError(
+                        "Handle Querying twitch for schedule icals for every stored channel, and generate the local ical-file containing all yielded events."
+                    )
+                elif args["action"] == "repo":
+                    raise NotImplementedError(
+                        "Handle Pushing of updated local ical repo state to renote repo state."
+                    )
+                elif args["action"] == "ical":
+                    raise NotImplementedError(
+                        "Handle update of google calendar via google ical update script here. experimental feature, not done yet."
+                    )
             else:
                 raise NotImplementedError(
                     f"The argument {args.command}is not implemented."
