@@ -18,6 +18,7 @@ from twitchschedulerpy.modules.command_handlers import (
     handle_channels,
     handle_configs,
 )
+from twitchschedulerpy.modules.git.repo import check_repository, setup_repository
 from twitchschedulerpy.modules.utility import (
     convert_format_args,
 )
@@ -111,6 +112,10 @@ def main():
                         "Handle all of the below - just a wrapper."
                     )
                 elif args["action"] == "twitch":
+                    ## ENSURE LOCAL TARGET REPOSITORY EXISTS (AND HAS A REMOTE)
+                    if not check_repository(CH=CH, RL = RL):
+                        setup_repository(CH=CH,RL = RL)
+
                     ## GENERATE ICAL STRING
                     calendar_ical = handle_twitch(args, RL, CH)
 
