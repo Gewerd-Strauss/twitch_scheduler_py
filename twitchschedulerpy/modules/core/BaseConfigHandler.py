@@ -85,9 +85,24 @@ class BaseConfigHandler(ABC):
         self.log_dir.mkdir(exist_ok=True)
 
         # Lifecycle
-        self._lifecycle("init:start")
         self._init_schema()
-        self._lifecycle("schema:build")
+
+    def initialize(self):
+        """
+        Must be implemented by subclass inheriting from BaseConfigHandler.
+        Must call the following, in order:
+        
+        ```
+        self._lifecycle("init:start")
+        self.load()
+        self._lifecycle("configuration:loaded")
+        self.post_init()
+        self._lifecycle("post_init")
+        ```
+        """
+        # def initialize(self):
+        # Lifecycle
+        self._lifecycle("init:start")
         self.load()
         self._lifecycle("configuration:loaded")
         self.post_init()
