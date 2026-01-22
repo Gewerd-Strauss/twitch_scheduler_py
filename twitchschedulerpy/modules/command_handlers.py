@@ -1,3 +1,4 @@
+from pathlib import Path
 from twitchschedulerpy import __version__
 from twitchschedulerpy.modules.twitch_scheduler.twitch import (
     twitch_validate,
@@ -85,12 +86,9 @@ def handle_all():
     raise NotImplementedError("The callback for verb 'all' is not implemented yet.")
 
 def handle_local_file_interface(calendar_ical, args, RL, CH):
-    raise NotImplementedError("The writing of the file to a file location is not implemented because first we must set up: "
-                              + "\n- the config toggles for what type (repo vs gist),"
-                              + "\n- where that repo is placed,"
-                              + "\n- the repo-setup utility itself"
-                              + "\n- and probably more stuff"
-                              )
+    path = Path(CH.synch_repo) / "schedule.ics"
+    path.write_text(calendar_ical,encoding="utf-16le")
+    return path
 def handle_twitch(args, RL, CH) -> str:
     http = twitch_get_http_client()
     headers = twitch_get_headers(CH)
