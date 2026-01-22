@@ -7,11 +7,22 @@ class TwitchSchedulerConfigHandler(BaseConfigHandler):
         super().__init__(appname=appname, appauthor=appauthor, version=version, loglevel=loglevel, is_gui=is_gui)
         self.synch_repo = Path(self.application_directory) / "sync_repo"
         self.synch_repo.mkdir(exist_ok=True)
-        
+        self.initialize()
+
     def build_schema(self) -> ConfigSchema:
         return TwitchSchedulerSchema()
     def validate(self):
-        return super().validate()
+        if self.config.GENERAL.use_repo and not self.config.GITHUB.repo:
+            raise ValueError("use_repo=True requires GITHUB.repo to be set to TRUE")
+        if self.config.GENERAL.push_to_gist and self.config.GITHUB.gist < 0:
+            raise ValueError("push_to_gist=True requires a valid gist id")
+        if self.config.GENERAL.push_to_repo and self.config.GENERAL.push_to_gist:
+            raise ValueError("push_to_repo and push_to_gist are mutually exclusive")
+        if self.config.GENERAL.use_repo and not self.synch_repo.exists():
+            raise RuntimeError("sync repo directory missing")
+        # normalize declared channels.
+        self.config.CHANNELS = sorted(set(self.config.CHANNELS))
+
     def add_channel(self, channel):
         channels = self.raw_settings["CHANNELS"]
         if channel in channels:
@@ -28,6 +39,12 @@ class TwitchSchedulerConfigHandler(BaseConfigHandler):
         self.config = self.schema.build(self.raw_settings)
         self.save()
         return True
+    def post_init(self):
+        print("CUSTOM POST INIT PIPELINE")
+        return super().post_init()
+    def post_load(self):
+        print("CUSTOM POST LOAD PIPELINE")
+        return super().post_load()
 
 from dataclasses import dataclass, field
 from pathlib import Path
