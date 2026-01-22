@@ -30,6 +30,48 @@ def handle_configs(args, RL, CH):
         if args["access_token"] is not None:
             RL.log("handle_configs", "set", "access_token")
             CH.secrets.set("twitch_access_token",args["access_token"])
+    elif args["action"] == "github":
+        if "email" in args:
+            if args["email"] is not None:
+                CH.config.GITHUB.email = args["email"]
+                RL.log(
+                    "handle_configs", "set", f"git commit email to {args["email"]}"
+                )
+                
+        if "gist" in args:
+            if args["gist"] is not None and isinstance(args["gist"],str):
+                CH.config.GITHUB.gist = args["gist"]
+                RL.log(
+                    "handle_configs", "set", f"gist flag to {args["gist"]}"
+                )
+
+        if "login_via_ssh" in args:
+            if args["login_via_ssh"] is not None and isinstance(args["login_via_ssh"],bool):
+                CH.config.GITHUB.login_via_ssh = args["login_via_ssh"]
+                RL.log(
+                    "handle_configs", "set", f"git-remote type to {"ssh" if args["login_via_ssh"] else "https"}"
+                )
+        if "name" in args:
+            if args["name"] is not None:
+                CH.config.GITHUB.name = args["name"]
+                RL.log(
+                    "handle_configs", "set", f"github-username to {args["name"]}"
+                )
+        if "repo" in args:
+            if args["repo"] is not None:
+                CH.config.GITHUB.repo = args["repo"]
+                RL.log(
+                    "handle_configs", "set", f"git-repo to {args["repo"]}"
+                )
+        if "repo_remote" in args:
+            if args["repo_remote"] is not None:
+                CH.config.GITHUB.repo_remote = args["repo_remote"]
+                RL.log(
+                    "handle_configs", "set", f"repository remote to {args["repo_remote"]}"
+                )
+        CH.save()
+        pass
+
     else:
         raise NotImplementedError("config handling is not yet set up for components other than twitch.")
     return
