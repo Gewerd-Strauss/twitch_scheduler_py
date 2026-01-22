@@ -1,5 +1,5 @@
 /dev/
-/venv/
+.venv/
 __pycache__
 .vscode/launch.json
 /assets/*config.yml
@@ -14,3 +14,7 @@ build/*
 
 # distrib
 /dist/
+twitchschedulerpy/modules/core old/
+twitchschedulerpy/modules/example_app/
+/scripts/
+twitchschedulerpy/modules/twitch_scheduler/core_ext/ExternalHandler.py
