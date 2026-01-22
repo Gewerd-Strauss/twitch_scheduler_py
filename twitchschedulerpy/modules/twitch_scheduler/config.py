@@ -40,5 +40,5 @@ class TwitchSchedulerSchema(ConfigSchema):
         }
 
     def validate(self, config: dict) -> None:
-        if not config["CHANNELS"]:
-            raise ValueError("No channels configured")
+        if not isinstance(config["CHANNELS"],list):
+            raise TypeError(f"config-section 'CHANNELS' is not of type <list>")
