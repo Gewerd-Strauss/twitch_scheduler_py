@@ -7,9 +7,9 @@ import logging
 from abc import ABC, abstractmethod
 from pathlib import Path
 from platformdirs import user_config_dir
-from modules.core.state_store import StateStore
-from modules.core.secret_store import SecretStore
-from modules.core.config_schema import ConfigSchema
+from twitchschedulerpy.modules.core.state_store import StateStore
+from twitchschedulerpy.modules.core.secret_store import SecretStore
+from twitchschedulerpy.modules.core.config_schema import ConfigSchema
 
 class BaseConfigHandler(ABC):
     """
