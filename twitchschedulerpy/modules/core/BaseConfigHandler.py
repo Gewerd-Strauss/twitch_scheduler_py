@@ -83,6 +83,11 @@ class BaseConfigHandler(ABC):
         self.default_settings: dict = {}
         self.applied_settings: dict = {}
 
+        self.config_path = Path(self.application_directory) / "config.yml"
+        self.state_path = Path(self.application_directory) / "config.yml"
+        self.log_dir = Path(self.application_directory) / "logs"
+        self.log_dir.mkdir(exist_ok=True)
+
 
         # Lifecycle
         self._lifecycle("init:start")
