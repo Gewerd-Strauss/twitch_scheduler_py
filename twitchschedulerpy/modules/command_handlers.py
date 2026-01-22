@@ -25,3 +25,13 @@ def handle_configs(args, RL, CH):
     else:
         raise NotImplementedError("config handling is not yet set up for components other than twitch.")
     return
+def handle_channels(args, RL, CH):
+    if args["action"]=="add":
+        CH.add_channel(args["channel"])
+        RL.log("handle_channels","added channel",args["channel"])
+    elif args["action"]=="remove":
+        CH.rem_channel(args["channel"])
+        RL.log("handle_channels","removed channel",args["channel"])
+    elif args["action"]=="list":
+        raise NotImplementedError("The callback for verb 'channels' is not implemented yet.")
+    return

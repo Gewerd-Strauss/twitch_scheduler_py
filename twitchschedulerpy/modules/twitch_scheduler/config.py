@@ -7,7 +7,18 @@ class TwitchSchedulerConfigHandler(BaseConfigHandler):
         return TwitchSchedulerSchema()
     def validate(self):
         return super().validate()
-    
+    def add_channel(self, channel):
+        if channel not in self.applied_settings["CHANNELS"]:
+            self.applied_settings["CHANNELS"].append(channel)
+            return True
+        else:
+            return False
+    def rem_channel(self, channel):
+        if channel not in self.applied_settings["CHANNELS"]:
+            return False
+        else:
+            self.applied_settings["CHANNELS"].remove((channel))
+            return True
 
 
 class TwitchSchedulerSchema(ConfigSchema):

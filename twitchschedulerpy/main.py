@@ -7,6 +7,7 @@ from twitchschedulerpy import __appname__, __author__, __version__
 from twitchschedulerpy.modules.commandline import commandline_setup
 from twitchschedulerpy.modules.command_handlers import (
     handle_version,
+    handle_channels,
     handle_configs,
 )
 from twitchschedulerpy.modules.utility import (
@@ -64,6 +65,21 @@ def main():
             handle_configs(args, RL, CH)
         else:
             pass
+            if args["command"] == "channel":
+                # -------------------------------
+                # QUERY/MODIFY TWITCH CONFIG
+                # -------------------------------
+                if args["action"] == "add":
+                    handle_channels(args,RL, CH)
+                elif args["action"] == "remove":
+                    raise NotImplementedError("remove a channel to track here")
+                elif args["action"] == "list":
+                    raise NotImplementedError("list currently tracked channels here")
+                # handle_channels(args)
+            else:
+                raise NotImplementedError(
+                    f"The argument {args.command}is not implemented."
+                )
 
     pass
 

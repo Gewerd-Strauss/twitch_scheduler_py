@@ -232,6 +232,11 @@ def channel_parser_setup(channel_parser):
         """,
         formatter_class=argparse.RawTextHelpFormatter
     )
+    add_parser.add_argument(
+        "channel",
+        type=str,
+        help="Twitch channel name or ID to add",
+    )
     common_arguments(add_parser)  # Reuse shared arguments for 'gui'
     # 'remove' command
     remove_parser = channel_subparsers.add_parser(
@@ -241,6 +246,12 @@ def channel_parser_setup(channel_parser):
         Remove a Twitch Channel from the Channel-Schedule-Collection-routine, to no longer be queried when utility is executed.
         """,
         formatter_class=argparse.RawTextHelpFormatter
+    )
+    remove_parser.add_argument(
+        "--client-id",
+        dest="client_id",
+        type=str,
+        help="Set/Unset Twitch application Client ID",
     )
     common_arguments(remove_parser)  # Reuse shared arguments for 'gui'
     # 'list' command
