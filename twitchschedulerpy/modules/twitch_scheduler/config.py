@@ -13,37 +13,56 @@ class TwitchSchedulerConfigHandler(BaseConfigHandler):
     def validate(self):
         return super().validate()
     def add_channel(self, channel):
-        if channel not in self.applied_settings["CHANNELS"]:
-            self.applied_settings["CHANNELS"].append(channel)
-            self.save()
-            return True
-        else:
+        channels = self.raw_settings["CHANNELS"]
+        if channel in channels:
             return False
+        channels.append(channel)
+        self.config = self.schema.build(self.raw_settings)
+        self.save()
+        return True
     def rem_channel(self, channel):
-        if channel not in self.applied_settings["CHANNELS"]:
+        channels = self.raw_settings["CHANNELS"]
+        if channel not in channels:
             return False
-        else:
-            self.applied_settings["CHANNELS"].remove((channel))
-            self.save()
-            return True
+        channels.remove(channel)
+        self.config = self.schema.build(self.raw_settings)
+        self.save()
+        return True
+
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import List
+
+@dataclass
+class GeneralConfig:
+    open_gist_on_update: bool = False
+    open_repo_on_update: bool = False
+    push_to_gist: bool = False
+    push_to_repo: bool = False
+    use_repo: bool = False
+    copy_url: bool = False
+
+
+@dataclass
+class GitHubConfig:
+    gist: int = -1
+    repo: Path = Path()
+    name: str = ""
+    email: str = ""
+    login_via_ssh: bool = False
+
+
+@dataclass
+class MiscConfig:
+    open_gist_repo_on_update: bool = False
+
+@dataclass
+class TwitchSchedulerConfig:
+    GENERAL: GeneralConfig = field(default_factory=GeneralConfig)
+    CHANNELS: List[str] = field(default_factory=list)
+    GITHUB: GitHubConfig = field(default_factory=GitHubConfig)
+    MISCELLANEOUS: MiscConfig = field(default_factory=MiscConfig)
 
 
 class TwitchSchedulerSchema(ConfigSchema):
-
-    def defaults(self) -> dict:
-        return {
-            "GENERAL": {
-                
-                "open-gist-on-update": False,
-                "open-repo-on-update": False,
-                "push-to-gist": False,
-                "push-to-repo": False,
-                "use-repo": False,
-                "copy-url": False,
-            },
-            "CHANNELS": [],
-        }
-
-    def validate(self, config: dict) -> None:
-        if not isinstance(config["CHANNELS"],list):
-            raise TypeError(f"config-section 'CHANNELS' is not of type <list>")
+    config_model = TwitchSchedulerConfig
