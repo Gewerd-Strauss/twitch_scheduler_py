@@ -123,13 +123,8 @@ def main():
                     ## ENSURE LOCAL TARGET REPOSITORY EXISTS (AND HAS A REMOTE)
                     ## WRITE ICAL STRING TO FILE WITHIN LOCAL TARGET REPO
                     handle_local_file_interface(calendar_ical, args, RL, CH)
-                    raise NotImplementedError(
-                        "Handle Querying twitch for schedule icals for every stored channel, and generate the local ical-file containing all yielded events."
-                    )
                 elif args["action"] == "repo":
-                    raise NotImplementedError(
-                        "Handle Pushing of updated local ical repo state to renote repo state."
-                    )
+                    handle_repo(args, RL, CH)
                 elif args["action"] == "ical":
                     raise NotImplementedError(
                         "Handle update of google calendar via google ical update script here. experimental feature, not done yet."
