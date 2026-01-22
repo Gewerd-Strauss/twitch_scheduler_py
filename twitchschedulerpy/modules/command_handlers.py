@@ -115,7 +115,7 @@ def handle_all(args, RL: ResourceLogger, CH: TwitchSchedulerConfigHandler):
     # ==========
     # LOCAL REPO
     # ==========
-    handle_local_file_interface(calendar_ical, args, RL, CH)
+    handle_local_file_interface(calendar_ical, RL, CH)
 
     # ==========
     # GITHUB

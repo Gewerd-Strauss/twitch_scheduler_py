@@ -109,9 +109,6 @@ def main():
                 # -------------------------------
                 if args["action"] == "all":
                     handle_all(args = args, RL = RL, CH = CH)
-                    raise NotImplementedError(
-                        "Handle all of the below - just a wrapper."
-                    )
                 elif args["action"] == "twitch":
                     ## ENSURE LOCAL TARGET REPOSITORY EXISTS (AND HAS A REMOTE)
                     if not check_repository(CH=CH, RL = RL):
@@ -122,7 +119,7 @@ def main():
 
                     ## ENSURE LOCAL TARGET REPOSITORY EXISTS (AND HAS A REMOTE)
                     ## WRITE ICAL STRING TO FILE WITHIN LOCAL TARGET REPO
-                    handle_local_file_interface(calendar_ical, args, RL, CH)
+                    handle_local_file_interface(calendar_ical, RL, CH)
                 elif args["action"] == "repo":
                     handle_repo(args, RL, CH)
                 elif args["action"] == "ical":
