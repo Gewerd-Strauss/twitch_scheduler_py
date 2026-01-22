@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+from dataclasses import asdict, is_dataclass
 import os
 import yaml
 import argparse
@@ -10,6 +10,7 @@ from platformdirs import user_config_dir
 from twitchschedulerpy.modules.core.state_store import StateStore
 from twitchschedulerpy.modules.core.secret_store import SecretStore
 from twitchschedulerpy.modules.core.config_schema import ConfigSchema
+
 
 class BaseConfigHandler(ABC):
     """
@@ -28,17 +29,17 @@ class BaseConfigHandler(ABC):
     - Provides config/state/secret storage
     - Handles file IO and merging
     - Calls lifecycle hooks in a fixed order
-    
 
-    Subclasses MUST: 
+
+    Subclasses MUST:
     - define default config schema
     - validate semantic correctness
 
-    Subclasses MUST NOT: 
+    Subclasses MUST NOT:
     - override load/save logic
     - perform IO in build_default_settings
     """
-
+    version = 3
     def __init__(
         self,
         *,
@@ -70,37 +71,28 @@ class BaseConfigHandler(ABC):
         os.makedirs(self.application_directory, exist_ok=True)
 
         # Core stores
-        self.state = StateStore(
-            appname=appname,
-            appauthor=appauthor,
-            version=version
-        )
+        self.state = StateStore(appname=appname, appauthor=appauthor, version=version)
         self.secrets = SecretStore(
             appname=appname,
         )
 
         # Runtime containers
-        self.default_settings: dict = {}
-        self.applied_settings: dict = {}
+        self.raw_settings: dict = {}
+        self.config = None
 
         self.config_path = Path(self.application_directory) / "config.yml"
-        self.state_path = Path(self.application_directory) / "state.yml"
         self.log_dir = Path(self.application_directory) / "logs"
         self.log_dir.mkdir(exist_ok=True)
-
 
         # Lifecycle
         self._lifecycle("init:start")
         self._init_schema()
         self._lifecycle("schema:build")
-        self.apply_defaults()
-        self._lifecycle("defaults:applied")
         self.load()
         self._lifecycle("configuration:loaded")
         self.post_init()
         self._lifecycle("post_init")
-        
-    
+
     # ------------------------------------------------------------------
     # Lifecycle helpers
     # ------------------------------------------------------------------
@@ -117,11 +109,12 @@ class BaseConfigHandler(ABC):
             self.load_user_config_and_merge(self.config_path)
         else:
             self.logger.info("No config file found; using defaults")
+            self.config = self.schema.build(self.raw_settings)
             self.save()
-    def save(self) -> None:
-        self.logger.info("Written applied configuration to file.")
-        self.save_to_file(self.config_path)
 
+    def save(self) -> None:
+        self.logger.info("Configuration written to file.")
+        self.save_to_file(self.config_path)
 
     # ------------------------------------------------------------------
     # State hooks
@@ -129,6 +122,7 @@ class BaseConfigHandler(ABC):
 
     def load_stores(self) -> None:
         self.state.load()
+
     def save_stores(self) -> None:
         self.state.save()
 
@@ -167,10 +161,9 @@ class BaseConfigHandler(ABC):
 
     def _init_schema(self) -> None:
         self.schema = self.build_schema()
-        self.default_settings = self.schema.defaults()
-
-    def apply_defaults(self) -> None:
-        self.applied_settings = self.default_settings.copy()
+        if not is_dataclass(self.schema.config_model):
+            raise TypeError("config_model must be a dataclass")
+        self.raw_settings = asdict(self.schema.config_model())
 
     # ------------------------------------------------------------------
     # Loading / Saving
@@ -178,8 +171,8 @@ class BaseConfigHandler(ABC):
 
     def load_user_config_and_merge(self, path: str | Path) -> None:
         """
-        load_user_config_and_merge performs in order: 
-        - loads the user configuration, 
+        load_user_config_and_merge performs in order:
+        - loads the user configuration,
         - merges it into applied settings,
         - calls `self.validate()`; which is abstract and must be implemented
         - calls the `post_load()`-hook
@@ -191,13 +184,13 @@ class BaseConfigHandler(ABC):
         try:
             with open(path, "r", encoding="utf-8") as f:
                 user_config = yaml.safe_load(f) or {}
-            self.applied_settings = self.merge_dicts(self.applied_settings, user_config)
+            self.raw_settings = self.merge_dicts(self.raw_settings, user_config)
+            self.config = self.schema.build(self.raw_settings)
             self.logger.info(f"Loaded config from {path}")
             self._lifecycle(f"user_config:loaded ({path})")
-            
-            self.schema.validate(self.applied_settings)
+
+            self.validate()
             self._lifecycle("user_config:validated")
-            
 
             self.post_load()
             self._lifecycle("post_load")
@@ -209,7 +202,7 @@ class BaseConfigHandler(ABC):
     def save_to_file(self, path: str | Path) -> None:
         try:
             with open(path, "w", encoding="utf-8") as f:
-                yaml.dump(self.applied_settings, f, allow_unicode=True)
+                yaml.dump(asdict(self.config), f, allow_unicode=True)
             self.logger.info(f"Config saved to {path}")
         except Exception as e:
             self.logger.error(f"Failed to save config: {e}")
@@ -222,51 +215,28 @@ class BaseConfigHandler(ABC):
     # Merging
     # ------------------------------------------------------------------
 
-    def merge_dicts(
-        self,
-        dict_default: dict,
-        dict_user: dict,
-        allowed_missing_keys: list[str] | None = None,
-    ) -> dict:
-        if allowed_missing_keys is None:
-            allowed_missing_keys = []
-
-        merged = dict_default.copy()
-
-        for key, value in dict_user.items():
-            if key not in dict_default:
-                if key in allowed_missing_keys:
-                    self.logger.warning(
-                        f"Allowed extra key '{key}' found in user config."
-                    )
-                    merged[key] = value
-                else:
-                    # self.logger.error(f"Unhandled key '{key}' found in user config.")
-                    raise KeyError(f"Unhandled key '{key}' found in user config.")
+    def merge_dicts(self, base: dict, override: dict) -> dict:
+        result = base.copy()
+        for key, value in override.items():
+            if key not in base:
+                self.logger.warning(f"Ignoring unhandled key '{key}' in user config")
                 continue
-
-            if isinstance(dict_default[key], dict) and isinstance(value, dict):
-                merged[key] = self.merge_dicts(
-                    dict_default[key], value, allowed_missing_keys
-                )
+            if isinstance(base[key], dict) and isinstance(value, dict):
+                result[key] = self.merge_dicts(base[key], value)
             else:
-                merged[key] = value
-
-        for key in dict_default:
-            if key not in dict_user:
-                self.logger.debug(f"Using default value for missing key '{key}'.")
-
-        return merged
+                result[key] = value
+        return result
 
     # ------------------------------------------------------------------
     # Accessors
     # ------------------------------------------------------------------
 
     def get_section(self, name: str):
-        return self.applied_settings.get(name)
+        return getattr(self.config, name)
 
     def get_value(self, section: str, key: str, default=None):
-        return self.applied_settings.get(section, {}).get(key, default)
+        section_obj = getattr(self.config, section)
+        return getattr(section_obj, key, default)
 
     # ------------------------------------------------------------------
     # CLI (optional)
