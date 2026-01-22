@@ -1,5 +1,5 @@
 /dev/
-/venv/
+.venv/
 __pycache__
 .vscode/launch.json
 /assets/*config.yml
