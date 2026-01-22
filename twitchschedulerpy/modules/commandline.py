@@ -190,6 +190,7 @@ def execute_parser_setup(execute_parser):
         formatter_class=argparse.RawTextHelpFormatter,
     )
     common_arguments2(twitch_parser)
+    common_arguments3(twitch_parser)
 
     # 'repo' suboption
     repo_parser = execute_subparsers.add_parser(

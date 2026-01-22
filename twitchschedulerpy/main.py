@@ -70,7 +70,7 @@ def main():
                 # -------------------------------
                 # QUERY/MODIFY TWITCH CONFIG
                 # -------------------------------
-                handle_channels(args,RL, CH)
+                handle_channels(args, RL, CH)
             else:
                 raise NotImplementedError(
                     f"The argument {args.command}is not implemented."
