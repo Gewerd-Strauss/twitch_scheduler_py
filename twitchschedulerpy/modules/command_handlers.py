@@ -6,7 +6,8 @@ from twitchschedulerpy.modules.twitch_scheduler.twitch import (
     twitch_get_headers,
     twitch_get_broadcaster_id,
     twitch_get_schedule_ical,
-    twitch_build_ical
+    twitch_build_ical,
+)
 from twitchschedulerpy.modules.git.repo import (
     update_repository,
     check_repository,
@@ -82,8 +83,25 @@ def handle_configs(args, RL, CH):
     return
 
 
-def handle_all():
-    raise NotImplementedError("The callback for verb 'all' is not implemented yet.")
+def handle_all(args, RL, CH):
+    # ==========
+    # TWITCH
+    # ==========
+    ## ENSURE LOCAL TARGET REPOSITORY EXISTS (AND HAS A REMOTE)
+    if not check_repository(CH=CH, RL = RL):
+        setup_repository(CH=CH,RL = RL)
+
+    ## GENERATE ICAL STRING
+    calendar_ical = handle_twitch(args, RL, CH)
+    # ==========
+    # LOCAL REPO
+    # ==========
+    ical_path = handle_local_file_interface(calendar_ical, args, RL, CH)
+
+    # ==========
+    # GITHUB
+    # ==========
+    handle_repo(args, RL, CH)
 
 def handle_local_file_interface(calendar_ical, args, RL, CH):
     path = Path(CH.synch_repo) / "schedule.ics"

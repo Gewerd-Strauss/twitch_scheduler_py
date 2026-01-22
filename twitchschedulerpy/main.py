@@ -108,6 +108,7 @@ def main():
                 # EXECUTE SUBMODULES
                 # -------------------------------
                 if args["action"] == "all":
+                    handle_all(args = args, RL = RL, CH = CH)
                     raise NotImplementedError(
                         "Handle all of the below - just a wrapper."
                     )
