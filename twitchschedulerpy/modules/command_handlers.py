@@ -6,6 +6,10 @@ from twitchschedulerpy.modules.twitch_scheduler.twitch import (
     twitch_get_broadcaster_id,
     twitch_get_schedule_ical,
     twitch_build_ical
+from twitchschedulerpy.modules.git.repo import (
+    update_repository,
+    check_repository,
+    setup_repository,
 )
 import logging
 def handle_version(args):
@@ -111,7 +115,8 @@ def handle_twitch(args, RL, CH) -> str:
     calendar_ical = twitch_build_ical(schedules=schedules)
     RL.log("twitch", "built ical")
     return calendar_ical
-def handle_repo():
+def handle_repo(args, RL, CH):
+    update_repository(CH = CH, RL = RL)
     raise NotImplementedError("The callback for verb 'repo' is not implemented yet.")
 def handle_ical():
     raise NotImplementedError("The callback for verb 'ical' is not implemented yet.")

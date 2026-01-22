@@ -70,6 +70,7 @@ def update_repository(CH: TwitchSchedulerConfigHandler, RL: ResourceLogger):
         repo = f"git@github.com/{name}/{repo_remote}"
     else:
         repo = f"https://github.com/{name}/{repo_remote}.git"
+    raise AssertionError("WE MUST SURE THIS WORKS?")
     cmd = f"git add . & git commit -m'Update {timestamp}' & git push -f"
     subprocess.run(
         cmd,
