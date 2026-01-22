@@ -61,8 +61,15 @@ def setup_repository(CH: TwitchSchedulerConfigHandler, RL: ResourceLogger) -> No
     RL.log("setup_repository", f"reset, fetched, and pulled into {CH.synch_repo}", repo)
 
 
-def update_repository(CH: TwitchSchedulerConfigHandler):
+def update_repository(CH: TwitchSchedulerConfigHandler, RL: ResourceLogger):
     timestamp = datetime.datetime.now().isoformat()
+    name = CH.config.GITHUB.name
+    email = CH.config.GITHUB.email
+    repo_remote = CH.config.GITHUB.repo_remote
+    if CH.config.GITHUB.login_via_ssh:
+        repo = f"git@github.com/{name}/{repo_remote}"
+    else:
+        repo = f"https://github.com/{name}/{repo_remote}.git"
     cmd = f"git add . & git commit -m'Update {timestamp}' & git push -f"
     subprocess.run(
         cmd,
@@ -72,3 +79,5 @@ def update_repository(CH: TwitchSchedulerConfigHandler):
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
+    RL.log("update_repository","pushed to",repo)
+
