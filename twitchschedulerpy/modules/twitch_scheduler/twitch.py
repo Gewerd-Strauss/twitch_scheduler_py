@@ -98,7 +98,7 @@ def twitch_get_broadcaster_id(http, headers, channel: str) -> str:
     return data[0]["id"]
 
 
-def twitch_get_schedule_ical(http, headers, broadcaster_id: str) -> str:
+def twitch_get_schedule_ical(http, headers, broadcaster_id: str, channel: str) -> str:
     """
     Fetches the broadcaster's Twitch schedule and returns the iCal text
     containing only future events.
@@ -107,7 +107,6 @@ def twitch_get_schedule_ical(http, headers, broadcaster_id: str) -> str:
 
     # current UTC time in RFC3339 format (YYYY-MM-DDTHH:MM:SSZ)
     now_utc = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-
 
     params = {
         "broadcaster_id": broadcaster_id,
@@ -152,21 +151,24 @@ def twitch_get_schedule_ical(http, headers, broadcaster_id: str) -> str:
         start = segment["start_time"]
         end = segment["end_time"]
         title = segment["title"]
-        description = segment.get("category", {}).get("name", "")
+        category = segment.get("category", {}).get("name", "")
         uid = segment["id"]
-
+        twitch_url = f"https://www.twitch.tv/{channel}" if channel else ""
         ical_event = (
             f"BEGIN:VEVENT\n"
             f"UID:{uid}\n"
-            f"DTSTART:{start.replace('-', '').replace(':', '')}\n"
-            f"DTEND:{end.replace('-', '').replace(':', '')}\n"
+            f"DTSTART:{to_ical_utc(start)}\n"
+            f"DTSTAMP:{now_utc}\n"
+            f"DTEND:{to_ical_utc(end)}\n"
             f"SUMMARY:{title}\n"
-            f"DESCRIPTION:{description}\n"
-            f"END:VEVENT"
+            f"DESCRIPTION:({twitch_url}) {category}\n"
+            f"URL:{twitch_url}\n"
+            f"END:VEVENT\n"
         )
         ical_events.append(ical_event)
     return "\n\n".join(ical_events)
-
+def to_ical_utc(ts: str) -> str:
+    return ts.replace("-","").replace(":","").replace(".000","")
 ## Build calendar
 
 import re
@@ -206,14 +208,6 @@ def twitch_build_ical(schedules: dict[str, str]) -> str:
         )
 
         for event in events:
-            event = event.replace(
-                "SUMMARY:",
-                f"SUMMARY:({channel}) ",
-            )
-            event = event.replace(
-                "DESCRIPTION:",
-                f"DESCRIPTION:(www.twitch.tv/{channel}) ",
-            )
             ics_parts.append(event)
             ics_parts.append("")  # blank line between events
 
