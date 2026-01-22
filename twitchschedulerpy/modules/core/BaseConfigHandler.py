@@ -84,7 +84,7 @@ class BaseConfigHandler(ABC):
         self.applied_settings: dict = {}
 
         self.config_path = Path(self.application_directory) / "config.yml"
-        self.state_path = Path(self.application_directory) / "config.yml"
+        self.state_path = Path(self.application_directory) / "state.yml"
         self.log_dir = Path(self.application_directory) / "logs"
         self.log_dir.mkdir(exist_ok=True)
 
