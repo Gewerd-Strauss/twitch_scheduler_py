@@ -1,8 +1,13 @@
 from ..core.BaseConfigHandler import BaseConfigHandler
 from ..core.config_schema import ConfigSchema
-
+from pathlib import Path
 
 class TwitchSchedulerConfigHandler(BaseConfigHandler):
+    def __init__(self, *, appname, appauthor, version, loglevel = None, is_gui = None):
+        super().__init__(appname=appname, appauthor=appauthor, version=version, loglevel=loglevel, is_gui=is_gui)
+        self.synch_repo = Path(self.application_directory) / "sync_repo"
+        self.synch_repo.mkdir(exist_ok=True)
+        
     def build_schema(self) -> ConfigSchema:
         return TwitchSchedulerSchema()
     def validate(self):
