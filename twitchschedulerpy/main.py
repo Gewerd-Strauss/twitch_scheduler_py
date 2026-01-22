@@ -4,6 +4,10 @@ from twitchschedulerpy.modules.commandline import commandline_setup
 from twitchschedulerpy.modules.command_handlers import (
     handle_version,
 )
+from twitchschedulerpy.modules.utility import (
+    convert_format_args,
+)
+
 # VERBS:
 # channels
 #   - add       - add a  new channel to schedule
@@ -22,6 +26,7 @@ from twitchschedulerpy.modules.command_handlers import (
 
 # external
 
+
 def main():
     RL = ResourceLogger()
     parser = commandline_setup()
@@ -31,7 +36,7 @@ def main():
     elif args.command == "version":
         handle_version(args)
     else:
-        pass
+        args = convert_format_args(args)
 
 
     pass
