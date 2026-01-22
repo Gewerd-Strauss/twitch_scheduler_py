@@ -23,20 +23,18 @@ def setup_repository(CH: TwitchSchedulerConfigHandler, RL: ResourceLogger) -> No
     git_subdir = Path(CH.synch_repo)  / ".git"
     name = CH.config.GITHUB.name
     email = CH.config.GITHUB.email
-    repo_remote = CH.config.GITHUB.repo_remote
     if CH.config.GITHUB.login_via_ssh:
-        repo = f"git@github.com/{name}/{repo_remote}"
+        repo_remote = CH.config.GITHUB.repo_remote_ssh
     else:
-        repo = f"https://github.com/{name}/{repo_remote}.git"
+        repo_remote = CH.config.GITHUB.repo_remote_https
     if not os.path.exists(git_subdir):
         shutil.rmtree(CH.synch_repo)
         RL.log("setup_repository","clears",CH.synch_repo)
         cmd = (
-
-        f'git clone {repo} "{CH.synch_repo}" && '
-        f'git config --local core.autocrlf false && '
-        f'git config --local user.email "{email}" && '
-        f'git config --local user.name "{name}"'
+            f'git clone {repo_remote} "{CH.synch_repo}" && '
+            f'git config --local core.autocrlf false && '
+            f'git config --local user.email "{email}" && '
+            f'git config --local user.name "{name}"'
         )
         subprocess.run(
             cmd,
@@ -45,7 +43,7 @@ def setup_repository(CH: TwitchSchedulerConfigHandler, RL: ResourceLogger) -> No
             stdout= subprocess.DEVNULL,
             stderr=subprocess.DEVNULL
         )
-        RL.log("setup_repository",f"cloned {repo} into",CH.synch_repo)
+        RL.log("setup_repository",f"cloned {repo_remote} into",CH.synch_repo)
 
     # (reset/fetch/pull)
     cmd = "git reset --hard & git fetch & git pull"
@@ -58,27 +56,35 @@ def setup_repository(CH: TwitchSchedulerConfigHandler, RL: ResourceLogger) -> No
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
-    RL.log("setup_repository", f"reset, fetched, and pulled into {CH.synch_repo}", repo)
+    RL.log("setup_repository", f"reset, fetched, and pulled into {CH.synch_repo}", repo_remote)
 
 
 def update_repository(CH: TwitchSchedulerConfigHandler, RL: ResourceLogger):
-    timestamp = datetime.datetime.now().isoformat()
+    timestamp = datetime.datetime.now().isoformat().split(".")[0]
     name = CH.config.GITHUB.name
     email = CH.config.GITHUB.email
-    repo_remote = CH.config.GITHUB.repo_remote
     if CH.config.GITHUB.login_via_ssh:
-        repo = f"git@github.com/{name}/{repo_remote}"
+        repo_remote = CH.config.GITHUB.repo_remote_ssh
     else:
-        repo = f"https://github.com/{name}/{repo_remote}.git"
-    raise AssertionError("WE MUST SURE THIS WORKS?")
-    cmd = f"git add . & git commit -m'Update {timestamp}' & git push -f"
-    subprocess.run(
-        cmd,
-        shell=True,
-        cwd=CH.synch_repo,
-        check=True,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
-    RL.log("update_repository","pushed to",repo)
+        repo_remote = CH.config.GITHUB.repo_remote_https
+    for each in (
+        ["git", "add", "."],
+        ["git", "commit", f"-m'Update {timestamp}'"],
+        ["git", "push", "-f"],
+    ):
+        cwd = CH.synch_repo
+        env = os.environ.copy()
+        proc = subprocess.Popen(
+            args=each,
+            cwd=cwd,
+            env=env,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            start_new_session=True,
+            text=True,  # or universal_newlines=True (older)
+        )
+        stdout, stderr = proc.communicate()
+        print(f"[EXEC] Spawned: {each}\n\nSTDOUT: {stdout}\n\nSTDERR: {stderr}")
 
+    RL.log("update_repository","pushed to",repo_remote)

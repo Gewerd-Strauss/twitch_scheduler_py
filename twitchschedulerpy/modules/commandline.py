@@ -185,16 +185,16 @@ def config_parser_setup(config_parser):
         help="Set the user email under which commits are performed when committing and pushing to the remote repository.",
     )
     githubconfig_parser.add_argument(
-        "--repo-remote",
-        dest="repo_remote",
+        "--repo-remote-https",
+        dest="repo_remote_https",
         type=str,
-        help="Provide the **name** of the remote repository under the account signified by argument '--username'.",
+        help="(HTTPS-REMOTE-EXCLUSIVE!!) Provide the **complete** qualifying https-remote.",
     )
     githubconfig_parser.add_argument(
-        "--repo",
-        dest="repo_remote",
+        "--repo-remote-ssh",
+        dest="repo_remote_ssh",
         type=str,
-        help="Provide the **name** of the remote repository under the account signified by argument '--username'.",
+        help="(SSH-REMOTE-EXCLUSIVE!!) Provide the **complete** qualifying https-remote.",
     )
     githubconfig_parser.add_argument(
         "--login-via-ssh",
@@ -230,6 +230,7 @@ def execute_parser_setup(execute_parser):
         formatter_class=argparse.RawTextHelpFormatter,
     )
     common_arguments2(all_parser)
+    common_arguments3(all_parser)
     # 'twitch' suboption
     twitch_parser = execute_subparsers.add_parser(
         "twitch",

@@ -64,6 +64,8 @@ class GeneralConfig:
 class GitHubConfig:
     gist: int = -1
     repo: Path = ""
+    repo_remote_ssh: str = ""
+    repo_remote_https: str = ""
     name: str = ""
     email: str = ""
     repo_remote: str = ""

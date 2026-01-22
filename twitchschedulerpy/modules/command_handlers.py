@@ -1,3 +1,5 @@
+from twitchschedulerpy.modules.twitch_scheduler.config import TwitchSchedulerConfigHandler
+from twitchschedulerpy.modules.extensions import ResourceLogger
 from pathlib import Path
 from twitchschedulerpy import __version__
 from twitchschedulerpy.modules.twitch_scheduler.twitch import (
@@ -22,7 +24,7 @@ def handle_version(args):
         print(f"Current version: {__version__}")
     exit(0)
 
-def handle_configs(args, RL, CH):
+def handle_configs(args, RL: ResourceLogger, CH: TwitchSchedulerConfigHandler):
     logging.basicConfig(level=args["loglevel"])
     RL.log("main","inits","config")
     if args["action"]=="twitch":
@@ -69,11 +71,17 @@ def handle_configs(args, RL, CH):
                 RL.log(
                     "handle_configs", "set", f"git-repo to {args["repo"]}"
                 )
-        if "repo_remote" in args:
-            if args["repo_remote"] is not None:
-                CH.config.GITHUB.repo_remote = args["repo_remote"]
+        if "repo_remote_https" in args:
+            if args["repo_remote_https"] is not None:
+                CH.config.GITHUB.repo_remote_https = args["repo_remote_https"]
                 RL.log(
-                    "handle_configs", "set", f"repository remote to {args["repo_remote"]}"
+                    "handle_configs", "set", f"repository https-remote to {args["repo_remote_https"]}"
+                )
+        if "repo_remote_ssh" in args:
+            if args["repo_remote_ssh"] is not None:
+                CH.config.GITHUB.repo_remote_ssh = args["repo_remote_ssh"]
+                RL.log(
+                    "handle_configs", "set", f"repository ssh-remote to {args["repo_remote_ssh"]}"
                 )
         CH.save()
         pass
@@ -92,11 +100,11 @@ def handle_all(args, RL, CH):
         setup_repository(CH=CH,RL = RL)
 
     ## GENERATE ICAL STRING
-    calendar_ical = handle_twitch(args, RL, CH)
+    calendar_ical = handle_twitch(RL, CH)
     # ==========
     # LOCAL REPO
     # ==========
-    ical_path = handle_local_file_interface(calendar_ical, args, RL, CH)
+    handle_local_file_interface(calendar_ical, args, RL, CH)
 
     # ==========
     # GITHUB
