@@ -117,11 +117,13 @@ def handle_ical():
 
 def handle_channels(args, RL, CH):
     if args["action"]=="add":
-        CH.add_channel(args["channel"])
-        RL.log("handle_channels","added channel",args["channel"])
+        for channel in args["channels"]:
+            CH.add_channel(channel)
+            RL.log("handle_channels", "added channel", channel)
     elif args["action"]=="remove":
-        CH.rem_channel(args["channel"])
-        RL.log("handle_channels","removed channel",args["channel"])
+        for channel in args["channels"]:
+            CH.rem_channel(channel)
+            RL.log("handle_channels","removed channel",channel)
     elif args["action"]=="list":
         raise NotImplementedError("The callback for verb 'channels' is not implemented yet.")
     return
