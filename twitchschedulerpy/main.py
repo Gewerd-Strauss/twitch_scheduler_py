@@ -58,6 +58,7 @@ def main():
             version=__version__,
             loglevel=args["loglevel"],
         )
+        RL.add_log_location(CH.log_dir)
         if args["command"] == "config":
             # -------------------------------
             # HANDLE VERB: CONFIG
@@ -82,6 +83,7 @@ def main():
                 )
 
     pass
+
 
 if __name__ == "__main__":
     main()
