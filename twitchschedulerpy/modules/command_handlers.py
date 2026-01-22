@@ -33,6 +33,18 @@ def handle_configs(args, RL, CH):
     else:
         raise NotImplementedError("config handling is not yet set up for components other than twitch.")
     return
+
+
+def handle_all():
+    raise NotImplementedError("The callback for verb 'all' is not implemented yet.")
+
+def handle_local_file_interface(calendar_ical, args, RL, CH):
+    raise NotImplementedError("The writing of the file to a file location is not implemented because first we must set up: "
+                              + "\n- the config toggles for what type (repo vs gist),"
+                              + "\n- where that repo is placed,"
+                              + "\n- the repo-setup utility itself"
+                              + "\n- and probably more stuff"
+                              )
 def handle_twitch(args, RL, CH) -> str:
     http = twitch_get_http_client()
     headers = twitch_get_headers(CH)
@@ -55,7 +67,12 @@ def handle_twitch(args, RL, CH) -> str:
         schedules[channel] = ical_text
     calendar_ical = twitch_build_ical(schedules=schedules)
     return calendar_ical
-    raise NotImplementedError("The callback for verb 'twitch' is not implemented yet.")
+def handle_repo():
+    raise NotImplementedError("The callback for verb 'repo' is not implemented yet.")
+def handle_ical():
+    raise NotImplementedError("The callback for verb 'ical' is not implemented yet.")
+
+
 def handle_channels(args, RL, CH):
     if args["action"]=="add":
         CH.add_channel(args["channel"])

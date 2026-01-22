@@ -10,7 +10,11 @@ from twitchschedulerpy import __appname__, __author__, __version__
 from twitchschedulerpy.modules.commandline import commandline_setup
 from twitchschedulerpy.modules.command_handlers import (
     handle_version,
+    handle_all,
     handle_twitch,
+    handle_local_file_interface,
+    handle_repo,
+    handle_ical,
     handle_channels,
     handle_configs,
 )
@@ -73,6 +77,26 @@ def main():
             # -------------------------------
             handle_configs(args, RL, CH)
         else:
+            # -------------------------------
+            # CHECK CONNECTIVITY
+            # -------------------------------
+
+            # -------------------------------
+            # LOAD CONFIG / INITIATE SETTINGS
+            # -------------------------------
+            # LOAD GIT SECRET/pageant-PPHRASE
+            # -------------------------------
+
+            # -------------------------------
+            # CHECK FOR UTILITY UPDATES (LP)
+            # -------------------------------
+
+            # -------------------------------
+            # REPO: SET UP REPO IF REPO
+            # -------------------------------
+            # ELSE SET UP GIST
+            # -------------------------------
+
             if args["command"] == "channel":
                 # -------------------------------
                 # QUERY/MODIFY TWITCH CONFIG
@@ -87,7 +111,11 @@ def main():
                         "Handle all of the below - just a wrapper."
                     )
                 elif args["action"] == "twitch":
+                    ## GENERATE ICAL STRING
                     calendar_ical = handle_twitch(args, RL, CH)
+
+                    ## ENSURE LOCAL TARGET REPOSITORY EXISTS (AND HAS A REMOTE)
+                    ## WRITE ICAL STRING TO FILE WITHIN LOCAL TARGET REPO
                     handle_local_file_interface(calendar_ical, args, RL, CH)
                     raise NotImplementedError(
                         "Handle Querying twitch for schedule icals for every stored channel, and generate the local ical-file containing all yielded events."
