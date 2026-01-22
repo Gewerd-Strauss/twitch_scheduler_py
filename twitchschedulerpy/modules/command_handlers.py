@@ -98,16 +98,18 @@ def handle_twitch(args, RL, CH) -> str:
         broadcaster_id = twitch_get_broadcaster_id(
             http=http, headers=headers, channel=channel
         )
-        RL.log("twitch", "resolve", f"broadcaster_id for {channel}: {broadcaster_id}")
+        RL.log("twitch", "resolved", f"broadcaster_id for {channel}: {broadcaster_id}")
 
         # pull channel schedule
         ical_text = twitch_get_schedule_ical(
             http=http, headers=headers, broadcaster_id=broadcaster_id
         )
-        RL.log("twitch", "resolve", f"broadcaster_id for {channel}: {broadcaster_id}")
-        print(ical_text[:500])
+        if not ical_text:
+            continue
+        RL.log("twitch", "obtained schedule", channel)
         schedules[channel] = ical_text
     calendar_ical = twitch_build_ical(schedules=schedules)
+    RL.log("twitch", "built ical")
     return calendar_ical
 def handle_repo():
     raise NotImplementedError("The callback for verb 'repo' is not implemented yet.")

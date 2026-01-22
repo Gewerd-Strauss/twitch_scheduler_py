@@ -1,8 +1,6 @@
-import json
 from requests import Session
 from datetime import datetime, timezone
 from twitchschedulerpy.modules.twitch_scheduler.config import TwitchSchedulerConfigHandler
-
 def twitch_validate(http: Session, headers: list, CH: TwitchSchedulerConfigHandler) -> None:
     """
     validate api access to twitch's api for pulling channel data
@@ -116,11 +114,38 @@ def twitch_get_schedule_ical(http, headers, broadcaster_id: str) -> str:
         "start_time": now_utc,
     }
     response = http.get(endpoint, headers=headers, params=params)
-    if response.status_code != 200:
-        raise RuntimeError(
+    if response.status_code == 400:
+        RuntimeWarning(
+            f"Bad Request:"
             f"Failed to fetch schedule for broadcaster_id={broadcaster_id} "
-            f"(HTTP {response.status_code})"
+            f"(HTTP {response.status_code},"
+            f" TEXT {response.text.message})"
         )
+        return False
+    elif response.status_code == 401:
+        RuntimeWarning(
+            f"Unauthorized:"
+            f"(HTTP   {response.status_code},"
+            f" TEXT   {response.text}),"
+            f" REASON {response.reason}),"
+        )
+        return False
+    elif response.status_code == 403:
+        RuntimeWarning(
+            f"Forbidden:"
+            f"(HTTP   {response.status_code},"
+            f" TEXT   {response.text}),"
+            f" REASON {response.reason}),"
+        )
+        return False
+    elif response.status_code == 404:
+        RuntimeWarning(
+            f"No schedule:"
+            f"(HTTP   {response.status_code},"
+            f" TEXT   {response.text}),"
+            f" REASON {response.reason}),"
+        )
+        return False
     data = response.json()
     ical_events = []
     for segment in data.get("data", {}).get("segments", []):
