@@ -95,8 +95,11 @@ class BaseConfigHandler(ABC):
         self._lifecycle("schema:build")
         self.apply_defaults()
         self._lifecycle("defaults:applied")
+        self.load()
+        self._lifecycle("configuration:loaded")
         self.post_init()
         self._lifecycle("post_init")
+        
     
     # ------------------------------------------------------------------
     # Lifecycle helpers
@@ -105,6 +108,20 @@ class BaseConfigHandler(ABC):
     def _lifecycle(self, step: str) -> None:
         """Internal helper to track lifecycle steps via debug logging."""
         self.logger.debug(f"[lifecycle] {step}")
+
+    # ------------------------------------------------------------------
+    # Load / Save configuration
+    # ------------------------------------------------------------------
+    def load(self) -> None:
+        if self.config_path.exists():
+            self.load_user_config_and_merge(self.config_path)
+        else:
+            self.logger.info("No config file found; using defaults")
+            self.save()
+    def save(self) -> None:
+        self.logger.info("Written applied configuration to file.")
+        self.save_to_file(self.config_path)
+
 
     # ------------------------------------------------------------------
     # State hooks
@@ -181,8 +198,6 @@ class BaseConfigHandler(ABC):
             self.schema.validate(self.applied_settings)
             self._lifecycle("user_config:validated")
             
-            self.load_stores()
-            self._lifecycle("stores:load")
 
             self.post_load()
             self._lifecycle("post_load")
