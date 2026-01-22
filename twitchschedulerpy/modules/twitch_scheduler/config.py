@@ -63,9 +63,10 @@ class GeneralConfig:
 @dataclass
 class GitHubConfig:
     gist: int = -1
-    repo: Path = Path()
+    repo: Path = ""
     name: str = ""
     email: str = ""
+    repo_remote: str = ""
     login_via_ssh: bool = False
 
 
