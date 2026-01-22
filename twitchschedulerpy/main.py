@@ -1,6 +1,9 @@
 import logging
 from twitchschedulerpy.modules.extensions.ResourceLogger import ResourceLogger
 from twitchschedulerpy.modules.commandline import commandline_setup
+from twitchschedulerpy.modules.command_handlers import (
+    handle_version,
+)
 # VERBS:
 # channels
 #   - add       - add a  new channel to schedule
@@ -23,6 +26,12 @@ def main():
     RL = ResourceLogger()
     parser = commandline_setup()
     args = parser.parse_args()
+    if args.command is None:
+        parser.print_help()
+    elif args.command == "version":
+        handle_version(args)
+    else:
+        pass
 
 
     pass
