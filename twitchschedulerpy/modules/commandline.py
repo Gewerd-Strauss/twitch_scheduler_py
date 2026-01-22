@@ -162,6 +162,58 @@ def config_parser_setup(config_parser):
     )
     common_arguments2(twitchconfig_parser)
     common_arguments3(twitchconfig_parser)
+
+    githubconfig_parser = config_subparsers.add_parser(
+        "github",
+        help="Set/unset config data related to Interaction with GitHub",
+        description="""
+        Provide the following structure:
+        twitchschedulerpy config github [name <str>] 
+        """,
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
+    githubconfig_parser.add_argument(
+        "--username",
+        dest="name",
+        type=str,
+        help="Set the Github username under which the repository lies."
+    )
+    githubconfig_parser.add_argument(
+        "--useremail",
+        dest="email",
+        type=str,
+        help="Set the user email under which commits are performed when committing and pushing to the remote repository.",
+    )
+    githubconfig_parser.add_argument(
+        "--repo-remote",
+        dest="repo_remote",
+        type=str,
+        help="Provide the **name** of the remote repository under the account signified by argument '--username'.",
+    )
+    githubconfig_parser.add_argument(
+        "--repo",
+        dest="repo_remote",
+        type=str,
+        help="Provide the **name** of the remote repository under the account signified by argument '--username'.",
+    )
+    githubconfig_parser.add_argument(
+        "--login-via-ssh",
+        dest="login_via_ssh",
+        type=bool,
+        default = False,
+        help="Decide if the repo/gist remote should be set up as an SSH-remote (true), or an HTTPS-remote (false)",
+    )
+    githubconfig_parser.add_argument(
+        "--gist",
+        dest="gist",
+        type=str,
+        default = False,
+        help="Provide the gist URL component for the gist to push into, under the account signified by argument '--username'",
+    )
+    common_arguments2(githubconfig_parser)
+    common_arguments3(githubconfig_parser)
+
+
 def execute_parser_setup(execute_parser):
     execute_subparsers = execute_parser.add_subparsers(dest="action", required=True)
     # 'all' suboption
