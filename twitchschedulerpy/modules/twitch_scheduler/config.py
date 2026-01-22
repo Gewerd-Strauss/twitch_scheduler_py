@@ -10,6 +10,7 @@ class TwitchSchedulerConfigHandler(BaseConfigHandler):
     def add_channel(self, channel):
         if channel not in self.applied_settings["CHANNELS"]:
             self.applied_settings["CHANNELS"].append(channel)
+            self.save()
             return True
         else:
             return False
@@ -18,6 +19,7 @@ class TwitchSchedulerConfigHandler(BaseConfigHandler):
             return False
         else:
             self.applied_settings["CHANNELS"].remove((channel))
+            self.save()
             return True
 
 
