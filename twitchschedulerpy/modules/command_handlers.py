@@ -92,7 +92,7 @@ def handle_twitch(args, RL, CH) -> str:
     headers = twitch_get_headers(CH)
     twitch_validate(http,headers,CH)
     schedules = {}
-    for channel in CH.applied_settings["CHANNELS"]:
+    for channel in CH.config.CHANNELS:
 
         # resolve broadcaster id
         broadcaster_id = twitch_get_broadcaster_id(
