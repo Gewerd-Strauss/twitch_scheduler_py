@@ -106,14 +106,14 @@ def handle_twitch(args, RL, CH) -> str:
 
         # pull channel schedule
         ical_text = twitch_get_schedule_ical(
-            http=http, headers=headers, broadcaster_id=broadcaster_id
+            http=http, headers=headers, broadcaster_id=broadcaster_id, channel=channel
         )
         if not ical_text:
             continue
         RL.log("twitch", "obtained schedule", channel)
         schedules[channel] = ical_text
     calendar_ical = twitch_build_ical(schedules=schedules)
-    RL.log("twitch", "built ical")
+    RL.log("twitch", "built","ical")
     return calendar_ical
 def handle_repo(args, RL, CH):
     update_repository(CH = CH, RL = RL)
