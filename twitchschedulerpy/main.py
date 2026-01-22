@@ -1,5 +1,9 @@
 import logging
 from twitchschedulerpy.modules.extensions.ResourceLogger import ResourceLogger
+from twitchschedulerpy.modules.twitch_scheduler.config import (
+    TwitchSchedulerConfigHandler,
+)
+from twitchschedulerpy import __appname__, __author__, __version__
 from twitchschedulerpy.modules.commandline import commandline_setup
 from twitchschedulerpy.modules.command_handlers import (
     handle_version,
@@ -38,6 +42,20 @@ def main():
     else:
         args = convert_format_args(args)
 
+        # -------------------------------
+        # LOGGING
+        # -------------------------------
+        logging.basicConfig(level=args["loglevel"])
+        # -------------------------------
+        # INITIATE CONFIG HANDLER
+        # -------------------------------
+        RL.log("main", "inits", "config")
+        CH = TwitchSchedulerConfigHandler(
+            appauthor=__author__,
+            appname=__appname__,
+            version=__version__,
+            loglevel=args["loglevel"],
+        )
 
     pass
 
