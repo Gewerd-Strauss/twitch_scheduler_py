@@ -91,7 +91,18 @@ def handle_configs(args, RL: ResourceLogger, CH: TwitchSchedulerConfigHandler):
     return
 
 
-def handle_all(args, RL, CH):
+def handle_all(args, RL: ResourceLogger, CH: TwitchSchedulerConfigHandler):
+    """
+    Facilitates complete update-pipeline
+
+    Function facilitates all steps required to update the remote `.ical`-file
+
+    :param args: argument structure as parsed from commandline-options
+    :param CH: instance of TwitchSchedulerConfigHandler
+    :type CH: TwitchSchedulerConfigHandler
+    :param RL: instance of ResourceLogger
+    :type RL: ResourceLogger
+    """
     # ==========
     # TWITCH
     # ==========
@@ -111,14 +122,36 @@ def handle_all(args, RL, CH):
     # ==========
     handle_repo(args, RL, CH)
 
-def handle_local_file_interface(calendar_ical, args, RL, CH):
+def handle_local_file_interface(calendar_ical, RL: ResourceLogger, CH: TwitchSchedulerConfigHandler) -> Path:
+    """
+    Writes the ical-filestring to a local file (within the synchronization repository)
+
+    File is written with 'UTF-8'-encoding.
+
+    :param calendar_ical: file-string constituting the Twitch-Channel Schedules.
+    :param CH: instance of TwitchSchedulerConfigHandler
+    :type CH: TwitchSchedulerConfigHandler
+    :param RL: instance of ResourceLogger
+    :type RL: ResourceLogger
+    """
     path = Path(CH.synch_repo) / "schedule.ics"
     path.write_text(calendar_ical,encoding="utf-16le")
     return path
-def handle_twitch(args, RL, CH) -> str:
+
+def handle_twitch(RL: ResourceLogger, CH: TwitchSchedulerConfigHandler) -> str:
+    """
+    Docstring for handle_twitch
+
+    :param CH: instance of TwitchSchedulerConfigHandler
+    :type CH: TwitchSchedulerConfigHandler
+    :param RL: instance of ResourceLogger
+    :type RL: ResourceLogger
+    :return: calendar_ical: string constituting calendar in ical-format
+    :rtype: str
+    """
     http = twitch_get_http_client()
     headers = twitch_get_headers(CH)
-    twitch_validate(http,headers,CH)
+    twitch_validate(http,headers, CH)
     schedules = {}
     for channel in CH.config.CHANNELS:
 
@@ -139,14 +172,13 @@ def handle_twitch(args, RL, CH) -> str:
     calendar_ical = twitch_build_ical(schedules=schedules)
     RL.log("twitch", "built","ical")
     return calendar_ical
-def handle_repo(args, RL, CH):
+def handle_repo(args, RL: ResourceLogger, CH: TwitchSchedulerConfigHandler):
     update_repository(CH = CH, RL = RL)
-    raise NotImplementedError("The callback for verb 'repo' is not implemented yet.")
 def handle_ical():
     raise NotImplementedError("The callback for verb 'ical' is not implemented yet.")
 
 
-def handle_channels(args, RL, CH):
+def handle_channels(args, RL: ResourceLogger, CH: TwitchSchedulerConfigHandler):
     if args["action"]=="add":
         for channel in args["channels"]:
             CH.add_channel(channel)
