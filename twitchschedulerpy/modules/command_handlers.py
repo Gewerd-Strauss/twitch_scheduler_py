@@ -135,7 +135,9 @@ def handle_local_file_interface(calendar_ical, RL: ResourceLogger, CH: TwitchSch
     :type RL: ResourceLogger
     """
     path = Path(CH.synch_repo) / "schedule.ics"
-    path.write_text(calendar_ical,encoding="utf-16le")
+    with open (path,"w",encoding="utf-8",newline="\n") as f:
+        f.write(calendar_ical)
+    RL.log("handle_local_file_interface","wrote", path)
     return path
 
 def handle_twitch(RL: ResourceLogger, CH: TwitchSchedulerConfigHandler) -> str:
