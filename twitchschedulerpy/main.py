@@ -1,4 +1,7 @@
 import logging
+import os.path
+import shutil
+
 from twitchschedulerpy.modules.extensions.ResourceLogger import ResourceLogger
 from twitchschedulerpy.modules.twitch_scheduler.config import (
     TwitchSchedulerConfigHandler,
@@ -59,6 +62,10 @@ def main():
             version=__version__,
             loglevel=args["loglevel"],
         )
+        if os.path.exists(CH.log_dir):
+            shutil.rmtree(CH.log_dir)
+            CH.log_dir.mkdir()
+            RL.log("main", "clears", CH.log_dir)
         RL.add_log_location(CH.log_dir)
         if args["command"] == "config":
             # -------------------------------
