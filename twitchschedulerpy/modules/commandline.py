@@ -132,6 +132,9 @@ Valid Examples:
 
 
 def config_parser_setup(config_parser):
+    """
+    sets up parser for verb `config`
+    """
     config_subparsers = config_parser.add_subparsers(dest="action",required = True)
     twitchconfig_parser = config_subparsers.add_parser(
         "twitch",
@@ -215,6 +218,9 @@ def config_parser_setup(config_parser):
 
 
 def execute_parser_setup(execute_parser):
+    """
+    sets up parser for verb `execute`
+    """
     execute_subparsers = execute_parser.add_subparsers(dest="action", required=True)
     # 'all' suboption
     all_parser = execute_subparsers.add_parser(
@@ -275,6 +281,9 @@ def execute_parser_setup(execute_parser):
     ical_parser_setup(ical_parser)
 
 def channel_parser_setup(channel_parser):
+    """
+    sets up parser for verb `channel`
+    """
     # GUI-specific options
     channel_subparsers = channel_parser.add_subparsers(dest="action", required=True)
     # 'add' command
@@ -319,8 +328,14 @@ def channel_parser_setup(channel_parser):
 
 
 def ical_parser_setup(ical_parser):
+    """
+    sets up parser for verb `ical`
+    """
     pass
 def repo_parser_setup(repo_parser):
+    """
+    sets up parser for verb `repo`
+    """
     repo_parser.add_argument(
         '--force',
         "-f",
@@ -338,6 +353,9 @@ def repo_parser_setup(repo_parser):
 
 
 def version_parser_setup(version_parser):
+    """
+    sets up parser for verb `version`
+    """
     version_parser.add_argument(
         "--clean",
         "-c",
