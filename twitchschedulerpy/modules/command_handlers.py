@@ -25,6 +25,29 @@ def handle_version(args):
     exit(0)
 
 def handle_configs(args, RL: ResourceLogger, CH: TwitchSchedulerConfigHandler):
+    """
+    Handles updating internal configuration, by providing necessary data via commandline:
+
+    1. Twitch:
+        - twitch API client ID
+        - twitch API client secret
+        - twitch API access token
+    2. Github (**):
+        - user name
+        - user email
+        - remote repository https address
+        - remote repository ssh address
+        - login-via-ssh flag
+        - gist ID (#BUG: IS THIS ARG EVEN USED?)
+
+    (** see commandline help for verb `config github`)
+
+    :param args: argument structure as parsed from commandline-options
+    :param CH: instance of TwitchSchedulerConfigHandler
+    :type CH: TwitchSchedulerConfigHandler
+    :param RL: instance of ResourceLogger
+    :type RL: ResourceLogger
+    """
     logging.basicConfig(level=args["loglevel"])
     RL.log("main","inits","config")
     if args["action"]=="twitch":
@@ -95,7 +118,7 @@ def handle_all(RL: ResourceLogger, CH: TwitchSchedulerConfigHandler):
     """
     Facilitates complete update-pipeline
 
-    Function facilitates all steps required to update the remote `.ical`-file
+    Function facilitates all steps required to update the remote `.ical`-file.
 
     :param args: argument structure as parsed from commandline-options
     :param CH: instance of TwitchSchedulerConfigHandler
@@ -142,7 +165,12 @@ def handle_local_file_interface(calendar_ical, RL: ResourceLogger, CH: TwitchSch
 
 def handle_twitch(RL: ResourceLogger, CH: TwitchSchedulerConfigHandler) -> str:
     """
-    Docstring for handle_twitch
+    Handles interfacing with Twitch's API
+
+    Specifically, performs in order:
+    - authentication
+    - querying current schedule in ical-format
+    - building ical-conforming string to write to file **later**
 
     :param CH: instance of TwitchSchedulerConfigHandler
     :type CH: TwitchSchedulerConfigHandler
@@ -181,6 +209,16 @@ def handle_ical():
 
 
 def handle_channels(args, RL: ResourceLogger, CH: TwitchSchedulerConfigHandler):
+    """
+    Handles the internal management of which channels to process for the calendar
+    construction
+
+    :param args: argument structure as parsed from commandline-options
+    :param CH: instance of TwitchSchedulerConfigHandler
+    :type CH: TwitchSchedulerConfigHandler
+    :param RL: instance of ResourceLogger
+    :type RL: ResourceLogger
+    """
     if args["action"]=="add":
         for channel in args["channels"]:
             CH.add_channel(channel)
