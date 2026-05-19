@@ -108,7 +108,7 @@ def main():
                 # EXECUTE SUBMODULES
                 # -------------------------------
                 if args["action"] == "all":
-                    handle_all(args = args, RL = RL, CH = CH)
+                    handle_all(RL = RL, CH = CH)
                 elif args["action"] == "twitch":
                     ## ENSURE LOCAL TARGET REPOSITORY EXISTS (AND HAS A REMOTE)
                     if not check_repository(CH=CH, RL = RL):
@@ -121,7 +121,7 @@ def main():
                     ## WRITE ICAL STRING TO FILE WITHIN LOCAL TARGET REPO
                     handle_local_file_interface(calendar_ical, RL, CH)
                 elif args["action"] == "repo":
-                    handle_repo(args, RL, CH)
+                    handle_repo(RL, CH)
                 elif args["action"] == "ical":
                     raise NotImplementedError(
                         "Handle update of google calendar via google ical update script here. experimental feature, not done yet."

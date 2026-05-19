@@ -91,7 +91,7 @@ def handle_configs(args, RL: ResourceLogger, CH: TwitchSchedulerConfigHandler):
     return
 
 
-def handle_all(args, RL: ResourceLogger, CH: TwitchSchedulerConfigHandler):
+def handle_all(RL: ResourceLogger, CH: TwitchSchedulerConfigHandler):
     """
     Facilitates complete update-pipeline
 
@@ -120,7 +120,7 @@ def handle_all(args, RL: ResourceLogger, CH: TwitchSchedulerConfigHandler):
     # ==========
     # GITHUB
     # ==========
-    handle_repo(args, RL, CH)
+    handle_repo(RL, CH)
 
 def handle_local_file_interface(calendar_ical, RL: ResourceLogger, CH: TwitchSchedulerConfigHandler) -> Path:
     """
@@ -174,7 +174,7 @@ def handle_twitch(RL: ResourceLogger, CH: TwitchSchedulerConfigHandler) -> str:
     calendar_ical = twitch_build_ical(schedules=schedules)
     RL.log("twitch", "built","ical")
     return calendar_ical
-def handle_repo(args, RL: ResourceLogger, CH: TwitchSchedulerConfigHandler):
+def handle_repo(RL: ResourceLogger, CH: TwitchSchedulerConfigHandler):
     update_repository(CH = CH, RL = RL)
 def handle_ical():
     raise NotImplementedError("The callback for verb 'ical' is not implemented yet.")
