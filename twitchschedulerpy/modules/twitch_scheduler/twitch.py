@@ -151,7 +151,10 @@ def twitch_get_schedule_ical(http, headers, broadcaster_id: str, channel: str) -
         start = segment["start_time"]
         end = segment["end_time"]
         title = segment["title"]
-        category = segment.get("category", {}).get("name", "")
+        try:
+            category = segment.get("category", {}).get("name", "")
+        except:
+            category = ""
         uid = segment["id"]
         twitch_url = f"https://www.twitch.tv/{channel}" if channel else ""
         ical_event = (
