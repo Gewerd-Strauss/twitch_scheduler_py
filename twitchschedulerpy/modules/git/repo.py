@@ -47,7 +47,7 @@ def setup_repository(CH: TwitchSchedulerConfigHandler, RL: ResourceLogger) -> No
 
     # (reset/fetch/pull)
     cmd = "git reset --hard & git fetch & git pull"
-
+    try:
     subprocess.run(
         cmd,
         shell=True,
@@ -56,13 +56,13 @@ def setup_repository(CH: TwitchSchedulerConfigHandler, RL: ResourceLogger) -> No
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
+    except Exception as e:
+        RL.log("setup_repository",f"{cmd} failed", str(e))
     RL.log("setup_repository", f"reset, fetched, and pulled into {CH.synch_repo}", repo_remote)
 
 
 def update_repository(CH: TwitchSchedulerConfigHandler, RL: ResourceLogger):
     timestamp = datetime.datetime.now().isoformat().split(".")[0]
-    name = CH.config.GITHUB.name
-    email = CH.config.GITHUB.email
     if CH.config.GITHUB.login_via_ssh:
         repo_remote = CH.config.GITHUB.repo_remote_ssh
     else:
@@ -74,6 +74,7 @@ def update_repository(CH: TwitchSchedulerConfigHandler, RL: ResourceLogger):
     ):
         cwd = CH.synch_repo
         env = os.environ.copy()
+        try:
         proc = subprocess.Popen(
             args=each,
             cwd=cwd,
@@ -86,5 +87,16 @@ def update_repository(CH: TwitchSchedulerConfigHandler, RL: ResourceLogger):
         )
         stdout, stderr = proc.communicate()
         print(f"[EXEC] Spawned: {each}\n\nSTDOUT: {stdout}\n\nSTDERR: {stderr}")
-
-    RL.log("update_repository","pushed to",repo_remote)
+            if each[1]=="push":
+                if "main -> main" in stderr:
+                    RL.log("update_repository",each[1] + "ed to",repo_remote)
+                else:
+                    RL.log("update_repository", f"failed to push to {repo_remote}", f"STDOUT: {stdout}, STDERR: {stderr}")
+            else:
+                RL.log("update_repository",each[1],"ical file")
+        except Exception as e:
+            RL.log(
+                "update_repository",
+                f"{each[1]} {f"ed to {repo_remote}" if each[1]=="push" else ""} {str(e)}",
+                f"{"ed to" if each[1]=="push" else ""}",
+            )
