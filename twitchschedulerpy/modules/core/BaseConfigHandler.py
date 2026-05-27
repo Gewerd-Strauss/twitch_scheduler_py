@@ -192,7 +192,7 @@ class BaseConfigHandler(ABC):
         - calls `self.validate()`; which is abstract and must be implemented
         - calls the `post_load()`-hook
 
-        :param self: Description
+        :param self: Instance of BaseConfigHandler-derived Class
         :param path: Path to the configuration file to be loaded by the user
         :type path: str | Path
         """

@@ -68,7 +68,7 @@ def handle_configs(args, RL: ResourceLogger, CH: TwitchSchedulerConfigHandler):
                 RL.log(
                     "handle_configs", "set", f"git commit email to {args["email"]}"
                 )
-                
+
         if "gist" in args:
             if args["gist"] is not None and isinstance(args["gist"],str):
                 CH.config.GITHUB.gist = args["gist"]

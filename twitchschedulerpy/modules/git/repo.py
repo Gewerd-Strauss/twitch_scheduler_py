@@ -18,6 +18,18 @@ def check_repository(CH: TwitchSchedulerConfigHandler, RL: ResourceLogger) -> No
 
 
 def setup_repository(CH: TwitchSchedulerConfigHandler, RL: ResourceLogger) -> None:
+    """
+    sets up repository using the details declared in configuration as a remote for the calendar-repo.
+    
+    - Remotes can be declared both as SSH- or HTTPS-remotes
+    - if remote exists already, it is cloned down, before getting configured
+
+    :param CH: instance of TwitchSchedulerConfigHandler
+    :type CH: TwitchSchedulerConfigHandler
+    :param RL: instance of ResourceLogger
+    :type RL: ResourceLogger
+    """
+
     if not os.path.exists(CH.synch_repo):
         raise FileNotFoundError(f"Directory '{CH.synch_repo}' does not exist")
     git_subdir = Path(CH.synch_repo)  / ".git"
@@ -48,20 +60,29 @@ def setup_repository(CH: TwitchSchedulerConfigHandler, RL: ResourceLogger) -> No
     # (reset/fetch/pull)
     cmd = "git reset --hard & git fetch & git pull"
     try:
-    subprocess.run(
-        cmd,
-        shell=True,
-        cwd=CH.synch_repo,
-        check=True,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
+        subprocess.run(
+            cmd,
+            shell=True,
+            cwd=CH.synch_repo,
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
     except Exception as e:
         RL.log("setup_repository",f"{cmd} failed", str(e))
     RL.log("setup_repository", f"reset, fetched, and pulled into {CH.synch_repo}", repo_remote)
 
 
 def update_repository(CH: TwitchSchedulerConfigHandler, RL: ResourceLogger):
+    """
+    commits local file changes to the sync repository, then force-pushes them
+
+    :param CH: instance of TwitchSchedulerConfigHandler
+    :type CH: TwitchSchedulerConfigHandler
+    :param RL: instance of ResourceLogger
+    :type RL: ResourceLogger
+    """
+
     timestamp = datetime.datetime.now().isoformat().split(".")[0]
     if CH.config.GITHUB.login_via_ssh:
         repo_remote = CH.config.GITHUB.repo_remote_ssh
@@ -75,18 +96,18 @@ def update_repository(CH: TwitchSchedulerConfigHandler, RL: ResourceLogger):
         cwd = CH.synch_repo
         env = os.environ.copy()
         try:
-        proc = subprocess.Popen(
-            args=each,
-            cwd=cwd,
-            env=env,
-            stdin=subprocess.DEVNULL,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            start_new_session=True,
-            text=True,  # or universal_newlines=True (older)
-        )
-        stdout, stderr = proc.communicate()
-        print(f"[EXEC] Spawned: {each}\n\nSTDOUT: {stdout}\n\nSTDERR: {stderr}")
+            proc = subprocess.Popen(
+                args=each,
+                cwd=cwd,
+                env=env,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                start_new_session=True,
+                text=True,  # or universal_newlines=True (older)
+            )
+            stdout, stderr = proc.communicate()
+            print(f"[EXEC] Spawned: {each}\n\nSTDOUT: {stdout}\n\nSTDERR: {stderr}")
             if each[1]=="push":
                 if "main -> main" in stderr:
                     RL.log("update_repository",each[1] + "ed to",repo_remote)
