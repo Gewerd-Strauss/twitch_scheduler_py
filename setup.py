@@ -24,16 +24,13 @@ except FileNotFoundError:
     long_description = ""
 
 setup(
-    name="obsidian_knittr_py",  # Package name
+    name="twitch_scheduler_py",  # Package name
     version=get_version(),  # Use version from __init__.py
     packages=find_packages(include=["twitchschedulerpy", "twitchschedulerpy.*"]),
     install_requires=[
-        "appdirs==1.4.4",
-        "obsidianhtml==4.0.1",
-        "pyperclip==1.9.0",
-        "PyYAML==6.0.2",
+        "keyring==25.7.0",
         "setuptools==75.8.0",
-        "tkcalendar==1.6.1",
+        "platformdirs==4.9.4"
     ],
     extras_require={"dev": ["pipreqs", "black"]},
     entry_points={
@@ -44,7 +41,7 @@ setup(
     },
     author="Gewerd Strauss",
     author_email="/",  # Replace with a valid email address
-    description="A WIP port of https://github.com/Gewerd-Strauss/ObsidianKnittrTwitch-Scheduler",
+    description="A WIP port of https://github.com/Gewerd-Strauss/Twitch-Scheduler",
     long_description=long_description,  # Use the long description read from README.md
     long_description_content_type="text/markdown",
     url="https://github.com/Gewerd-Strauss/twitch_scheduler_py",  # Project URL
