@@ -228,5 +228,5 @@ def handle_channels(args, RL: ResourceLogger, CH: TwitchSchedulerConfigHandler):
             CH.rem_channel(channel)
             RL.log("handle_channels","removed channel",channel)
     elif args["action"]=="list":
-        raise NotImplementedError("The callback for verb 'channels' is not implemented yet.")
+        CH.list_channels()
     return

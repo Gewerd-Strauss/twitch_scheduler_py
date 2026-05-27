@@ -39,6 +39,9 @@ class TwitchSchedulerConfigHandler(BaseConfigHandler):
         self.config = self.schema.build(self.raw_settings)
         self.save()
         return True
+    def list_channels(self):
+        for i in self.get_section("CHANNELS"):
+            print(i)
     def post_init(self):
         print("CUSTOM POST INIT PIPELINE")
         return super().post_init()
