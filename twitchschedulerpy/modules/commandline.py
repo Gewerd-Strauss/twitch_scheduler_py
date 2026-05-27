@@ -5,6 +5,9 @@ import os
 
 
 def commandline_setup():
+    """
+    sets up the various command and argument parsers for the various verbs of this utility. See `python -m twitchschedulerpy -h` for details
+    """
     parser = argparse.ArgumentParser(
         description="""
         Utility for converting a single note within an 'Obsidian.md'-vault to formats
@@ -65,29 +68,34 @@ def commandline_setup():
 
 
 def common_arguments3(parser):
-    """Add common arguments to each subcommand."""
+    """
+    Add common arguments to each subcommand.
+    :param parser: applies to parsers
+        - twitchconfig_parser
+        - githubconfig_parser
+        - all_parser
+        - twitch_parser
+    """
+
     parser.add_argument(
         "pass_through",
         nargs="*",
-        # help="""
-        # Pass-through arguments in format 'namespace::key=value'`nValid Examples:\n- "
-        # + "quarto::pdf.author=Ballos"
-        # + "\n- "
-        # + "quarto::html.author=Professor E GADD"
-        # + "\n- "
-        # + "quarto::docx.author=Zote the mighty, a knight of great renown
-        # """,
         help="""
-        Pass-through arguments in format 'namespace::key=value'
-        Valid Examples:
-        \t- "quarto::pdf.author=Ballos"
-        \t- "quarto::html.author=Professor E GADD"
-        \t- "quarto::docx.author=Zote the mighty, a knight of great renown"
+        BUG: MUST BE REMOVED.
         """,
     )
 
 def common_arguments2(parser):
-    """Add common arguments to each subcommand."""
+    """
+    Add common arguments to each subcommand.
+    :param parser: applies to parsers
+        - twitchconfig_parser
+        - githubconfig_parser
+        - all_parser
+        - twitch_parser
+        - repo_parser
+        - ical_parser
+    """
     parser.add_argument(
         '--loglevel',
         default='INFO',
@@ -95,7 +103,14 @@ def common_arguments2(parser):
         help="Set the logging level (default: INFO)",
     )
 def common_arguments(parser):
-    """Add common arguments to each subcommand."""
+    """
+    Add common arguments to each subcommand.
+    :param parser: applies to parsers
+        - add_parser
+        - remove_parser
+        - list_parser
+    """
+
     parser.add_argument(
         "-i",
         "--id",
@@ -108,7 +123,7 @@ def common_arguments(parser):
         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
         help="Set the logging level (default: INFO)",
     )
-        # Add pass-through argument
+    # Add pass-through argument
     parser.add_argument(
         "pass_through",
         nargs="*",

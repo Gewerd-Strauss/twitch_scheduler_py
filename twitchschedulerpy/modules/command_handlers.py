@@ -17,11 +17,16 @@ from twitchschedulerpy.modules.git.repo import (
 )
 import logging
 def handle_version(args):
-    """Handle the 'version' command."""
+    """
+    Handle the 'version' command.
+    
+    provide flag `--clean`/`-c` to print cleaned, numeric-string only; 
+    if absent, print flavoured version
+    """
     if args.clean:
         print(__version__)
     else:
-        print(f"Current version: {__version__}")
+        print(f"twitch_scheduler_py version: {__version__}")
     exit(0)
 
 def handle_configs(args, RL: ResourceLogger, CH: TwitchSchedulerConfigHandler):
@@ -203,6 +208,15 @@ def handle_twitch(RL: ResourceLogger, CH: TwitchSchedulerConfigHandler) -> str:
     RL.log("twitch", "built","ical")
     return calendar_ical
 def handle_repo(RL: ResourceLogger, CH: TwitchSchedulerConfigHandler):
+    """
+    This function acts as alias to repo.update_repository(); which handles the repo update logic 
+
+    :param CH: instance of TwitchSchedulerConfigHandler
+    :type CH: TwitchSchedulerConfigHandler
+    :param RL: instance of ResourceLogger
+    :type RL: ResourceLogger
+    """
+
     update_repository(CH = CH, RL = RL)
 def handle_ical():
     raise NotImplementedError("The callback for verb 'ical' is not implemented yet.")
