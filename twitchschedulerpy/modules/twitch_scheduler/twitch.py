@@ -77,7 +77,7 @@ def twitch_get_headers(CH) -> list:
 ###
 
 
-def twitch_get_broadcaster_id(http, headers, channel: str) -> str:
+def twitch_get_broadcaster_id(http: Session, headers: list, channel: str) -> str:
     endpoint = "https://api.twitch.tv/helix/users"
     params = {
         "login": channel.lower(),

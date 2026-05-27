@@ -115,7 +115,7 @@ def main():
                         setup_repository(CH=CH,RL = RL)
 
                     ## GENERATE ICAL STRING
-                    calendar_ical = handle_twitch(args, RL, CH)
+                    calendar_ical = handle_twitch(RL, CH)
 
                     ## ENSURE LOCAL TARGET REPOSITORY EXISTS (AND HAS A REMOTE)
                     ## WRITE ICAL STRING TO FILE WITHIN LOCAL TARGET REPO

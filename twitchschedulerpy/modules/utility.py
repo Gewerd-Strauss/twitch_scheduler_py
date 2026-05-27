@@ -5,8 +5,6 @@ import re as re
 import sys
 
 
-
-
 def convert_format_args(args):
     """Execute the convert command."""
 
